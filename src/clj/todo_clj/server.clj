@@ -22,6 +22,9 @@
    :headers {"Content-Type" "application/json"}
    :body body})
 
+(defn res-no-content []
+  {:status 204})
+
 (defroutes routes
   (GET "/" _
     {:status 200
@@ -34,7 +37,13 @@
   (POST "/todos" {body :body}
     (-> body
         todos/create
-        res-created)))
+        res-created))
+  (DELETE "/todos" _
+    (todos/delete-all)
+    (res-no-content))
+  (DELETE "/todos/:id" {{id :id} :params}
+    (todos/delete id)
+    (res-no-content)))
 
 (def http-handler
   (-> routes

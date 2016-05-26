@@ -10,3 +10,9 @@
 
 (defn create [{title :title}]
   (first (sql/insert! spec :todos {:title title})))
+
+(defn delete [id]
+  (sql/delete! spec :todos ["id = ?::integer" id]))
+
+(defn delete-all []
+  (sql/delete! spec :todos []))
