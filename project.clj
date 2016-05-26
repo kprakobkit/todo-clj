@@ -8,6 +8,7 @@
                  [org.clojure/clojurescript "1.8.51" :scope "provided"]
                  [ring "1.4.0"]
                  [ring/ring-defaults "0.2.0"]
+                 [ring/ring-json "0.4.0"]
                  [bk/ring-gzip "0.1.1"]
                  [ring.middleware.logger "0.5.0"]
                  [compojure "1.5.0"]

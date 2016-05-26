@@ -16,11 +16,16 @@
     {:status 200
      :headers {"Content-Type" "text/html; charset=utf-8"}
      :body (io/input-stream (io/resource "public/index.html"))})
-  (resources "/"))
+  (resources "/")
+  (GET "/todos" _
+    {:status 200
+     :headers {"Content-Type" "application/json"}
+     :body (todos/all)}))
 
 (def http-handler
   (-> routes
       (wrap-defaults api-defaults)
+      wrap-json-response
       wrap-with-logger
       wrap-gzip))
 
