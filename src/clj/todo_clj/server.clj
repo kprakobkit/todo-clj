@@ -12,8 +12,15 @@
   (:gen-class))
 
 (defn res-created [todo]
+  {:status 201
+   :body todo
+   :headers {"Content-Type" "application/json"
+             "Location" (str "/todos/" (:id todo))}})
+
+(defn res-ok [body]
   {:status 200
-   :body todo})
+   :headers {"Content-Type" "application/json"}
+   :body body})
 
 (defroutes routes
   (GET "/" _
@@ -22,9 +29,8 @@
      :body (io/input-stream (io/resource "public/index.html"))})
   (resources "/")
   (GET "/todos" _
-    {:status 200
-     :headers {"Content-Type" "application/json"}
-     :body (todos/all)})
+    (-> (todos/all)
+        res-ok))
   (POST "/todos" {body :body}
     (-> body
         todos/create

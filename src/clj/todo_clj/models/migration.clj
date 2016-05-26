@@ -15,7 +15,7 @@
                         (sql/create-table-ddl
                          :todos
                          [[:id :serial "PRIMARY KEY"]
-                          [:name :text]])))
+                          [:title :text]])))
   (println " done"))
 
 (defn drop-db []
@@ -23,4 +23,4 @@
                       (sql/drop-table-ddl :todos)))
 
 (defn populate []
-  (sql/insert! todo/spec :todos {:name "buy eggs"}))
+  (sql/insert! todo/spec :todos {:title "buy eggs"}))

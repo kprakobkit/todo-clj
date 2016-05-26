@@ -8,5 +8,5 @@
   (let [todos (sql/query spec ["select * from todos"])]
     todos))
 
-(defn create [todo]
-  (sql/insert! spec :todos todo))
+(defn create [{title :title}]
+  (first (sql/insert! spec :todos {:title title})))
