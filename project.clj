@@ -87,7 +87,8 @@
              :server-logfile "log/figwheel.log"}
   
   :aliases {"migrate" ["run" "-m" "todo-clj.models.migration/migrate"]
-            "populate" ["run" "-m" "todo-clj.models.migration/populate"]}
+            "populate" ["run" "-m" "todo-clj.models.migration/populate"]
+            "drop-db" ["run" "-m" "todo-clj.models.migration/drop-db"]}
 
   :doo {:build "test"}
 

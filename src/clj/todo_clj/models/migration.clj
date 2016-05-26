@@ -18,5 +18,9 @@
                           [:name :text]])))
   (println " done"))
 
+(defn drop-db []
+  (sql/db-do-commands todo/spec
+                      (sql/drop-table-ddl :todos)))
+
 (defn populate []
   (sql/insert! todo/spec :todos {:name "buy eggs"}))
