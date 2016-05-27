@@ -11,14 +11,22 @@
 (defn position-to-order [todo]
   (rename-keys todo {:position :order}))
 
+(defn add-url [todo]
+  (assoc todo :url (str "/todos/" (:id todo))))
+
+(defn parse [todo]
+  (-> todo
+      position-to-order
+      add-url))
+
 (defn all []
-  (vec (sql/query spec ["select * from todos"] {:row-fn position-to-order})))
+  (vec (sql/query spec ["select * from todos"] {:row-fn parse})))
 
 (defn create [todo]
-  (position-to-order (first (sql/insert! spec :todos (order-to-position todo)))))
+  (parse (first (sql/insert! spec :todos (order-to-position todo)))))
 
 (defn find-by-id [id]
-  (first (sql/query spec ["select * from todos where id = ?::integer" id] {:row-fn position-to-order})))
+  (first (sql/query spec ["select * from todos where id = ?::integer" id] {:row-fn parse})))
 
 (defn update-todo [id todo]
   (sql/update! spec :todos (order-to-position todo) ["id = ?::integer" id])

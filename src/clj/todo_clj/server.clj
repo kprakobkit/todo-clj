@@ -18,9 +18,6 @@
    :headers {"Content-Type" "application/json"
              "Location" (str "/todos/" (:id todo))}})
 
-(defn todo-representation [todo]
-  (assoc todo :url (str "/todos/" (:id todo))))
-
 (defn res-ok [body]
   {:status 200
    :headers {"Content-Type" "application/json"}
@@ -37,22 +34,18 @@
   (resources "/")
   (GET "/todos" _
     (-> (todos/all)
-        (#(map todo-representation %))
         res-ok))
   (GET "/todos/:id" {{id :id} :params}
     (-> id
         todos/find-by-id
-        todo-representation
         res-ok))
   (POST "/todos" {body :body}
     (-> body
         todos/create
-        todo-representation
         res-created))
   (PATCH "/todos/:id" {{id :id :as params} :params body :body}
     (-> id
         (#(todos/update-todo % body))
-        todo-representation
         res-created))
   (DELETE "/todos" _
     (todos/delete-all)
