@@ -16,7 +16,8 @@
                          :todos
                          [[:id :serial "PRIMARY KEY"]
                           [:title :text]
-                          [:completed :boolean :default :false]])))
+                          [:completed :boolean :default :false]
+                          [:position :integer]])))
   (println " done"))
 
 (defn drop-db []
@@ -24,4 +25,4 @@
                       (sql/drop-table-ddl :todos)))
 
 (defn populate []
-  (sql/insert! todo/spec :todos {:title "buy eggs"}))
+  (sql/insert! todo/spec :todos {:title "buy eggs" :position 123}))
