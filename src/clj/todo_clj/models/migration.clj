@@ -15,7 +15,8 @@
                         (sql/create-table-ddl
                          :todos
                          [[:id :serial "PRIMARY KEY"]
-                          [:title :text]])))
+                          [:title :text]
+                          [:completed :boolean :default :false]])))
   (println " done"))
 
 (defn drop-db []
