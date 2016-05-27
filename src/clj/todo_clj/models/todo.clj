@@ -14,6 +14,10 @@
 (defn find-by-id [id]
   (first (sql/query spec ["select * from todos where id = ?::integer" id])))
 
+(defn update-todo [id attr]
+  (sql/update! spec :todos attr ["id = ?::integer" id])
+  (find-by-id id))
+
 (defn delete [id]
   (sql/delete! spec :todos ["id = ?::integer" id]))
 

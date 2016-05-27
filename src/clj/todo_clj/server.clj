@@ -1,6 +1,6 @@
 (ns todo-clj.server
   (:require [clojure.java.io :as io]
-            [compojure.core :refer [ANY GET PUT POST DELETE defroutes]]
+            [compojure.core :refer [ANY GET PUT PATCH POST DELETE defroutes]]
             [compojure.route :refer [resources]]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.gzip :refer [wrap-gzip]]
@@ -47,6 +47,11 @@
   (POST "/todos" {body :body}
     (-> body
         todos/create
+        todo-representation
+        res-created))
+  (PATCH "/todos/:id" {{id :id :as params} :params body :body}
+    (-> id
+        (#(todos/update-todo % body))
         todo-representation
         res-created))
   (DELETE "/todos" _
