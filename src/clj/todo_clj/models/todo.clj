@@ -6,10 +6,13 @@
 
 (defn all []
   (let [todos (sql/query spec ["select * from todos"])]
-    todos))
+    (vec todos)))
 
 (defn create [{title :title}]
   (first (sql/insert! spec :todos {:title title})))
+
+(defn find-by-id [id]
+  (first (sql/query spec ["select * from todos where id = ?::integer" id])))
 
 (defn delete [id]
   (sql/delete! spec :todos ["id = ?::integer" id]))
