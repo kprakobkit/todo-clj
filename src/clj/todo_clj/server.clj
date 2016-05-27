@@ -8,7 +8,8 @@
             [environ.core :refer [env]]
             [ring.adapter.jetty :refer [run-jetty]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
-            [todo-clj.models.todo :as todos])
+            [todo-clj.models.todo :as todos]
+            [clojure.walk :refer [prewalk prewalk-demo]])
   (:gen-class))
 
 (defn res-created [todo]
@@ -55,9 +56,26 @@
     (todos/delete id)
     (res-no-content)))
 
+(defn build-host-name [{name :server-name port :server-port}]
+  (str "http://" name ":" port))
+
+(defn expand-url-body [body host-name]
+  (prewalk #(if (map? %)
+              (assoc % :url (str host-name (:url %)))
+              %) body))
+
+(defn wrap-response-url-body [handler]
+  (fn [request]
+    (let [response (handler request)
+          host-name (build-host-name request)
+          body (:body response)
+          url (:url body)]
+      (assoc response :body (expand-url-body body host-name)))))
+
 (def http-handler
   (-> routes
       (wrap-defaults api-defaults)
+      wrap-response-url-body
       wrap-json-response
       (wrap-json-body {:keywords? true})
       wrap-with-logger
