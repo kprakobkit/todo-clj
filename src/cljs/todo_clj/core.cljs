@@ -25,6 +25,11 @@
                     :response-format :json
                     :keywords? true})))
 
+(defn handle-key-press [e cursor owner]
+  (let [code (.-charCode e)]
+    (if (= code 13)
+      (add-todo cursor owner))))
+
 (defn root-component [app owner]
   (reify
     om/IWillMount
@@ -36,9 +41,7 @@
     (render [_]
       (dom/div nil
         (dom/h1 nil "Todo")
-        (dom/div nil
-          (dom/input #js {:ref "new-todo" :type "text"} nil)
-          (dom/button #js {:onClick #(add-todo app owner)} "Submit"))
+        (dom/input #js {:ref "new-todo" :type "text" :onKeyPress #(handle-key-press % app owner)} nil)
         (dom/ul nil (map todo (get app :todos)))))))
 
 (om/root
