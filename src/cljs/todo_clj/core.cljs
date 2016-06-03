@@ -1,7 +1,7 @@
 (ns todo-clj.core
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
-            [ajax.core :refer [GET POST ajax-request json-request-format json-response-format]]))
+            [ajax.core :refer [GET POST]]))
 
 (enable-console-print!)
 
@@ -18,9 +18,7 @@
 
 (defn add-todo [app owner]
   (let [title (.-value (om/get-node owner "new-todo"))]    
-    (POST "/todos" {:handler #(om/transact! app :todos (fn [todos]
-                                                         (println (conj todos %))
-                                                         (conj todos %)))
+    (POST "/todos" {:handler #(om/transact! app :todos (fn [todos] (conj todos %)))
                     :error-handler trace
                     :params {:title title}
                     :format :json
@@ -36,7 +34,6 @@
                      :response-format :json}))
     om/IRender
     (render [_]
-      (println (:todos app))
       (dom/div nil
         (dom/h1 nil "Todo")
         (dom/div nil
