@@ -5,19 +5,26 @@
 
 (enable-console-print!)
 
-(defonce app-state (atom {:text "Hello Chestnut!"}))
+(defonce app-state (atom {:todos []}))
 
-(defn handler [response]
-  (.log js/console (str response)))
+(defn handler [response cursor]
+  (om/update! cursor :todos response))
+
+(defn todo [todo]
+  (dom/li #js {:key (:id todo)} (:title todo)))
 
 (defn root-component [app owner]
   (reify
     om/IWillMount
     (will-mount [_]
-      (GET "/todos" {:handler handler}))
+      (GET "/todos" {:handler #(handler % app)
+                     :keywords? true
+                     :response-format :json}))
     om/IRender
     (render [_]
-      (dom/div nil (dom/h1 nil (:text app))))))
+      (dom/div nil
+        (dom/h1 nil "Todo")
+        (dom/ul nil (map todo (get app :todos)))))))
 
 (om/root
  root-component
