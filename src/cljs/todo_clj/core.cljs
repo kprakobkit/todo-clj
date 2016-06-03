@@ -14,7 +14,9 @@
   (om/update! cursor :todos response))
 
 (defn todo [todo]
-  (dom/li #js {:key (:id todo)} (:title todo)))
+  (dom/li #js {:key (:id todo) :className "todo"}
+    (:title todo)
+    (dom/button #js {:className "todo__remove"} "x")))
 
 (defn add-todo [app owner]
   (let [title (.-value (om/get-node owner "new-todo"))]    

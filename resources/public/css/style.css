@@ -1,3 +1,11 @@
 h1 {
   text-decoration: underline;
 }
+
+.todo__remove {
+  display: none;
+}
+
+.todo:hover .todo__remove {
+  display: inline-block;
+}
