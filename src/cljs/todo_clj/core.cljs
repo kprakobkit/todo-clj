@@ -41,7 +41,11 @@
     (render [_]
       (dom/div nil
         (dom/h1 nil "Todo")
-        (dom/input #js {:ref "new-todo" :type "text" :onKeyPress #(handle-key-press % app owner)} nil)
+        (dom/input #js {:ref "new-todo"
+                        :type "text"
+                        :placeholder "What needs to be done?"
+                        :onKeyPress #(handle-key-press % app owner)}
+                   nil)
         (dom/ul nil (map todo (get app :todos)))))))
 
 (om/root
