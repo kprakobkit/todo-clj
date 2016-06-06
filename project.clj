@@ -16,7 +16,8 @@
                  [org.omcljs/om "1.0.0-alpha35"]
                  [org.clojure/java.jdbc "0.6.1"]
                  [org.postgresql/postgresql "9.4.1208.jre7"]
-                 [cljs-ajax "0.5.5"]]
+                 [cljs-ajax "0.5.5"]
+                 [org.clojure/core.async "0.2.374"]]
 
   :plugins [[lein-cljsbuild "1.1.3"]
             [lein-environ "1.0.3"]]

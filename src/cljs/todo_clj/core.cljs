@@ -1,7 +1,9 @@
 (ns todo-clj.core
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
-            [ajax.core :refer [GET POST DELETE]]))
+            [ajax.core :refer [GET POST DELETE]]
+            [cljs.core.async :refer [put! chan <!]]))
 
 (enable-console-print!)
 
@@ -14,19 +16,20 @@
   (om/update! cursor :todos response))
 
 
-(defn remove-todo [todo]
+(defn remove-todo [todo handler] 
   (let [url (:url todo)]
-    (DELETE url {:handler trace
+    (DELETE url {:handler handler
                  :error-handler trace
                  :format :json})))
 
 (defn todo-view [todo]
   (reify
-    om/IRender
-    (render [_]
+    om/IRenderState
+    (render-state [_ {:keys [delete]}]
       (dom/li #js {:key (str (:id todo) (rand)) :className "todo"}
               (:title todo)
-              (dom/button #js {:className "todo__remove" :onClick #(remove-todo todo)} "x")))))
+              (dom/button #js {:className "todo__remove"
+                               :onClick #(remove-todo todo (fn [_] (put! delete @todo)))} "x")))))
 
 (defn add-todo [app owner]
   (let [title (.-value (om/get-node owner "new-todo"))]    
@@ -44,22 +47,35 @@
 
 (defn root-component [app owner]
   (reify
+    om/IInitState
+    (init-state [_]
+      {:delete (chan)})
     om/IWillMount
     (will-mount [_]
-      (GET "/todos" {:handler #(handler % app)
+      (let [delete (om/get-state owner :delete)]
+        (GET "/todos" {:handler #(handler % app)
                      :keywords? true
-                     :response-format :json}))
-    om/IRender
-    (render [_]
+                     :response-format :json})
+        (go (loop []
+              (let [todo (<! delete)]
+                (om/transact! app :todos
+                   (fn [todos] (vec (remove #(=  todo %) todos))))
+                (recur))))))
+    om/IRenderState
+    (render-state [this {:keys [delete]}]
       (dom/div nil
         (dom/h1 nil "My Todo")
         (dom/input #js {:ref "new-todo"
                         :type "text"
                         :placeholder "What needs to be done?"
-                        :onKeyPress #(handle-key-press % app owner)}
-                   nil)
+                        :onKeyPress #(handle-key-press % app owner)} nil)
         (apply dom/ul nil
-          (map #(om/build todo-view %) (:todos app)))))))
+          (map
+           (fn [todo]
+             (om/build todo-view todo
+                       {:react-key (:id todo)
+                        :init-state {:delete delete}}))
+           (:todos app)))))))
 
 (om/root
  root-component
