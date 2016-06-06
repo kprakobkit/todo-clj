@@ -42,7 +42,7 @@
     om/IRender
     (render [_]
       (dom/div nil
-        (dom/h1 nil "Todo")
+        (dom/h1 nil "My Todo")
         (dom/input #js {:ref "new-todo"
                         :type "text"
                         :placeholder "What needs to be done?"
