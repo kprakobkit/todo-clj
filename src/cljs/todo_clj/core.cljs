@@ -31,9 +31,11 @@
               (dom/button #js {:className "todo__remove"
                                :onClick #(remove-todo todo (fn [_] (put! delete @todo)))} "x")))))
 
-(defn add-todo [app owner]
-  (let [title (.-value (om/get-node owner "new-todo"))]    
-    (POST "/todos" {:handler #(om/transact! app :todos (fn [todos] (conj todos %)))
+(defn add-todo [cursor owner]
+  (let [title (om/get-state owner :title)]
+    (POST "/todos" {:handler (fn [res]
+                               (om/transact! cursor :todos (fn [todos] (conj todos res)))
+                               (om/set-state! owner :title ""))
                     :error-handler trace
                     :params {:title title}
                     :format :json
@@ -45,11 +47,16 @@
     (if (= code 13)
       (add-todo cursor owner))))
 
+(defn handle-change [e owner]
+  (let [title (.. e -target -value)]
+    (om/set-state! owner :title title)))
+
 (defn root-component [app owner]
   (reify
     om/IInitState
     (init-state [_]
-      {:delete (chan)})
+      {:delete (chan)
+       :title ""})
     om/IWillMount
     (will-mount [_]
       (let [delete (om/get-state owner :delete)]
@@ -62,12 +69,14 @@
                    (fn [todos] (vec (remove #(=  todo %) todos))))
                 (recur))))))
     om/IRenderState
-    (render-state [this {:keys [delete]}]
+    (render-state [this {:keys [delete title]}]
       (dom/div nil
         (dom/h1 nil "My Todo")
         (dom/input #js {:ref "new-todo"
                         :type "text"
                         :placeholder "What needs to be done?"
+                        :value title
+                        :onChange #(handle-change % owner)
                         :onKeyPress #(handle-key-press % app owner)} nil)
         (apply dom/ul nil
           (map
