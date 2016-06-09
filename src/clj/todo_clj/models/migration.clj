@@ -25,4 +25,5 @@
                       (sql/drop-table-ddl :todos)))
 
 (defn populate []
-  (sql/insert! todo/spec :todos {:title "buy eggs" :position 123}))
+  (sql/insert! todo/spec :todos {:title "buy eggs" :position 1 :completed true})
+  (sql/insert! todo/spec :todos {:title "file tax return" :position 3}))
