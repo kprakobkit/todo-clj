@@ -46,7 +46,7 @@
   (PATCH "/todos/:id" {{id :id :as params} :params body :body}
     (-> id
         (#(todos/update-todo % body))
-        res-created))
+        res-ok))
   (DELETE "/todos" _
     (todos/delete-all)
     (res-no-content))
