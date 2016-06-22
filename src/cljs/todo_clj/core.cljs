@@ -35,6 +35,15 @@
     #js {}
     #js {:display "none"}))
 
+(defn save-todo [todo owner]
+  (let [title (:title todo)]
+    (update-todo todo {:title title}
+     #(om/set-state! owner :editing false))))
+
+(defn handle-edit-title [e todo]
+  (let [title (.. e -target -value)]
+    (om/transact! todo #(assoc % :title title))))
+
 (defn todo-view [todo owner]
   (reify
     om/IInitState
@@ -50,7 +59,8 @@
                               :value (:title todo)
                               :autoFocus true
                               :style (display editing)
-                              :onBlur #(om/set-state! owner :editing false)})
+                              :onBlur #(save-todo todo owner)
+                              :onChange #(handle-edit-title % todo)})
               (dom/input #js {:type "checkbox"
                               :checked (:completed todo)
                               :onClick #(update-todo todo {:completed (not (:completed todo))} (fn [updated-todo] (put! update updated-todo)))})
