@@ -30,12 +30,27 @@
                       :response-format :json
                       :keywords? true}))
 
-(defn todo-view [todo]
+(defn display [show]
+  (if show
+    #js {}
+    #js {:display "none"}))
+
+(defn todo-view [todo owner]
   (reify
+    om/IInitState
+    (init-state [_]
+      {:editing false})
     om/IRenderState
-    (render-state [_ {:keys [delete update]}]
+    (render-state [_ {:keys [delete update editing]}]
       (dom/li #js {:key (str (:id todo) (rand)) :className "todo"}
-              (:title todo)
+              (dom/span #js {:style (display (not editing))
+                             :onDoubleClick #(om/set-state! owner :editing true)}
+                        (:title todo))
+              (dom/input #js {:ref "edit-todo"
+                              :value (:title todo)
+                              :autoFocus true
+                              :style (display editing)
+                              :onBlur #(om/set-state! owner :editing false)})
               (dom/input #js {:type "checkbox"
                               :checked (:completed todo)
                               :onClick #(update-todo todo {:completed (not (:completed todo))} (fn [updated-todo] (put! update updated-todo)))})
