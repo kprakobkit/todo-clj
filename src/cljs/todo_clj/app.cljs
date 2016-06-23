@@ -15,6 +15,16 @@
   (let [title (.. e -target -value)]
     (om/set-state! owner :title title)))
 
+(defn remove-todo! [app todo]
+  (om/transact! app :todos
+                (fn [todos] (vec (remove #(=  todo %) todos)))))
+
+(defn add-todo! [app todo]
+  (om/transact! app :todos
+                (fn [todos]
+                  (let [idx (.indexOf (map #(:url %) todos) (:url todo))]
+                    (assoc todos idx todo)))))
+
 (defn app [app owner]
   (reify
     om/IInitState
@@ -30,14 +40,8 @@
         (go (loop []
               (let [[todo chan] (alts! [delete update])]
                 (condp = chan
-                  delete
-                  (om/transact! app :todos
-                                (fn [todos] (vec (remove #(=  todo %) todos))))
-                  update
-                  (om/transact! app :todos
-                                (fn [todos]
-                                  (let [idx (.indexOf (map #(:url %) todos) (:url todo))]
-                                    (assoc todos idx todo)))))
+                  delete (remove-todo! app todo)
+                  update (add-todo! app todo))
                 (recur))))))
     om/IRenderState
     (render-state [this {:keys [delete title update]}]
