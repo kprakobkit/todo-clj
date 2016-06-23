@@ -13,7 +13,7 @@
                  :keywords? true
                  :response-format :json}))
 
-(defn remove-todo [todo handler] 
+(defn remove-todo [todo handler]
   (let [url (:url todo)]
     (DELETE url {:handler handler
                  :error-handler trace
