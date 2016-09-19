@@ -55,7 +55,7 @@
     (res-no-content)))
 
 (defn build-host-name [{name :server-name port :server-port}]
-  (str "http://" name ":" port))
+  (str "https://" name ":" port))
 
 (defn expand-url-body [body host-name]
   (prewalk #(if (map? %)
